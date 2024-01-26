@@ -1,28 +1,31 @@
 #!/usr/bin/python3
 import sys
 
-# Function to find the greatest common divisor of two numbers
+
 def gcd(a, b):
+    """Find the greatest common divisor of two numbers."""
     while b:
         a, b = b, a % b
     return a
 
-# Function to find a non-trivial factor of a number using Pollard's rho algorithm
+
 def pollard_rho(n):
+    """Find a non-trivial factor of a number using Pollard's rho algorithm."""
     if n % 2 == 0:
         return 2
     x = 2
     y = 2
     d = 1
-    f = lambda x: (x ** 2 + 1) % n
+    def f(x): return (x ** 2 + 1) % n
     while d == 1:
         x = f(x)
         y = f(f(y))
         d = gcd(abs(x - y), n)
     return d
 
-# Function to factorize a number into prime factors
+
 def factorize(n):
+    """Factorize a number into prime factors."""
     factors = []
     while n > 1:
         factor = pollard_rho(n)
@@ -31,8 +34,9 @@ def factorize(n):
             n //= factor
     return factors
 
-# Main function to read the number from file and factorize it
+
 def main():
+    """Read a number from a file and factorize it."""
     if len(sys.argv) != 2:
         print("Usage: {} <file>".format(sys.argv[0]))
         sys.exit(1)
@@ -52,6 +56,6 @@ def main():
         print("Invalid number in file")
         sys.exit(1)
 
+
 if __name__ == "__main__":
     main()
-
