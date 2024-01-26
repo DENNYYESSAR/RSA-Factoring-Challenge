@@ -1,19 +1,57 @@
 #!/usr/bin/python3
-from sys import argv
+import sys
 
+# Function to find the greatest common divisor of two numbers
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
 
-with open(argv[1]) as f:
-    for line in f:
-        num = int(line)
-        print("{:d}=".format(num), end="")
-        if num % 2 == 0:
-            print("{}*2".format(num//2))
-            continue
-        for i in range(3, num, 2):
-            if num % i == 0:
-                factor = num//i
-                for j in range(3, factor, 2):
-                    if factor % j == 0 or i % j == 0:
-                        break
-                print("{}*{}".format(factor, i))
-                break
+# Function to find a non-trivial factor of a number using Pollard's rho algorithm
+def pollard_rho(n):
+    if n % 2 == 0:
+        return 2
+    x = 2
+    y = 2
+    d = 1
+    f = lambda x: (x ** 2 + 1) % n
+    while d == 1:
+        x = f(x)
+        y = f(f(y))
+        d = gcd(abs(x - y), n)
+    return d
+
+# Function to factorize a number into prime factors
+def factorize(n):
+    factors = []
+    while n > 1:
+        factor = pollard_rho(n)
+        while n % factor == 0:
+            factors.append(factor)
+            n //= factor
+    return factors
+
+# Main function to read the number from file and factorize it
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: {} <file>".format(sys.argv[0]))
+        sys.exit(1)
+
+    filename = sys.argv[1]
+    try:
+        with open(filename, 'r') as file:
+            num = int(file.readline())
+            factors = factorize(num)
+            print("{}=".format(num), end="")
+            print("*".join(map(str, factors)), end="")
+            print()
+    except FileNotFoundError:
+        print("File not found:", filename)
+        sys.exit(1)
+    except ValueError:
+        print("Invalid number in file")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+
